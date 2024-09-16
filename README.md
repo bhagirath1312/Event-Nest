@@ -28,7 +28,7 @@ Follow these steps to set up the project locally:
 
 1. **Clone the Repository**:
     ```bash
-    git clone https://github.com/<your-friend-username>/Event-Nest.git
+    git clone https://github.com/bhagirath1312/Event-Nest-.git
     cd Event-Nest
     ```
 
