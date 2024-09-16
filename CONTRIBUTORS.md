@@ -14,7 +14,7 @@ We appreciate the contributions from the following individuals:
   - Integrate Django and implemented event functionality
   - Designed and implemented REST API endpoints.
     
-- **[Om Keswani](https://github.com/omkeswani27)** - Backend Developer
+- **[Om Keswani](https://github.com/omKeswani27)** - Backend Developer
   - implemented user authentication 
 
 Thank you to all our contributors for their valuable work!
