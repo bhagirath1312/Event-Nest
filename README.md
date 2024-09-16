@@ -77,3 +77,7 @@ To run the tests for the project, use the following command:
 
 ```bash
 python manage.py test
+```
+**Current Version**
+
+Current release: v1.0.0
