@@ -1,55 +1,74 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import 'bootstrap/dist/css/bootstrap.css';
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap/dist/js/bootstrap.bundle.min";
+import { useAuth } from '../components/User_authentication/AuthContext';
 
-function AddEvent() {
-    const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
-    const [date, setDate] = useState('');
-    const [time, setTime] = useState('');
-    const [location, setLocation] = useState('');
-    const [image, setImage] = useState(null);
+const AddEvent = () => {
+    const { token } = useAuth();
+    const [event, setEvent] = useState({
+        title: '',
+        description: '',
+        date: '',
+        time: '',
+        location: '',
+        image: null,
+    });
     const [error, setError] = useState(null);
+    const [success, setSuccess] = useState(null);
 
-    const handleSubmit = (e) => {
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setEvent((prevEvent) => ({
+            ...prevEvent,
+            [name]: value,
+        }));
+    };
+
+    const handleImageChange = (e) => {
+        setEvent((prevEvent) => ({
+            ...prevEvent,
+            image: e.target.files[0],
+        }));
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        
         const formData = new FormData();
-        formData.append('title', title);
-        formData.append('description', description);
-        formData.append('date', date);
-        formData.append('time', time);
-        formData.append('location', location);
-        if (image) {
-            formData.append('image', image);
+        formData.append('title', event.title);
+        formData.append('description', event.description);
+        formData.append('date', event.date);
+        formData.append('time', event.time);
+        formData.append('location', event.location);
+        if (event.image) {
+            formData.append('image', event.image);
         }
 
-        axios.post('http://localhost:8000/api/events/', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            }
-        })
-        .then(response => {
-            console.log('Event created successfully:', response.data);
-            setTitle('');
-            setDescription('');
-            setDate('');
-            setTime('');
-            setLocation('');
-            setImage(null);
-        })
-        .catch(error => {
+        try {
+            await axios.post('http://localhost:8000/api/events/', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    Authorization: `Token ${token}`,  // Use Token instead of Bearer
+                },
+            });
+            setSuccess('Event created successfully!');
+            setEvent({
+                title: '',
+                description: '',
+                date: '',
+                time: '',
+                location: '',
+                image: null,
+            });
+        } catch (error) {
+            console.error('Error adding event:', error);
             setError('There was an error creating the event.');
-            console.error('Error creating event:', error);
-        });
+        }
     };
 
     return (
         <div className="container mt-4">
-            <h1 className='text-center'>Add a New Event</h1>
+            <h1>Add Event</h1>
             {error && <div className="alert alert-danger">{error}</div>}
+            {success && <div className="alert alert-success">{success}</div>}
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
                     <label htmlFor="title">Title</label>
@@ -57,8 +76,9 @@ function AddEvent() {
                         type="text"
                         className="form-control"
                         id="title"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
+                        name="title"
+                        value={event.title}
+                        onChange={handleChange}
                         required
                     />
                 </div>
@@ -67,8 +87,9 @@ function AddEvent() {
                     <textarea
                         className="form-control"
                         id="description"
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
+                        name="description"
+                        value={event.description}
+                        onChange={handleChange}
                         required
                     />
                 </div>
@@ -78,8 +99,9 @@ function AddEvent() {
                         type="date"
                         className="form-control"
                         id="date"
-                        value={date}
-                        onChange={(e) => setDate(e.target.value)}
+                        name="date"
+                        value={event.date}
+                        onChange={handleChange}
                         required
                     />
                 </div>
@@ -89,8 +111,9 @@ function AddEvent() {
                         type="time"
                         className="form-control"
                         id="time"
-                        value={time}
-                        onChange={(e) => setTime(e.target.value)}
+                        name="time"
+                        value={event.time}
+                        onChange={handleChange}
                         required
                     />
                 </div>
@@ -100,8 +123,9 @@ function AddEvent() {
                         type="text"
                         className="form-control"
                         id="location"
-                        value={location}
-                        onChange={(e) => setLocation(e.target.value)}
+                        name="location"
+                        value={event.location}
+                        onChange={handleChange}
                         required
                     />
                 </div>
@@ -111,13 +135,14 @@ function AddEvent() {
                         type="file"
                         className="form-control"
                         id="image"
-                        onChange={(e) => setImage(e.target.files[0])}
+                        name="image"
+                        onChange={handleImageChange}
                     />
                 </div>
                 <button type="submit" className="btn btn-primary mt-3">Add Event</button>
             </form>
         </div>
     );
-}
+};
 
 export default AddEvent;

@@ -1,31 +1,59 @@
-import EventCard from "../../components/EventCard";
-import Navigation from "../../components/Navigation/Navigation";
-import { eventList } from "../../utils/EventDatabase";
-import './EventList.css'
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import EventCard from '../../components/EventCard'; // Adjust the path as needed
+import './EventList.css'; // Assuming you have a CSS file for styling
 
-function EventList() {
-  return (
-    <div>
-      <Navigation />
-    <div className="event-list-wrapper">
+const EventList = () => {
+    const [events, setEvents] = useState([]);
+    const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchEvents = async () => {
+            try {
+                const response = await axios.get('http://localhost:8000/api/events/');
+                setEvents(response.data);
+            } catch (error) {
+                console.error('Error fetching events:', error);
+                setError('Failed to load events');
+            } finally {
+                setLoading(false); // Stop loading indicator
+            }
+        };
+
+        fetchEvents();
+    }, []);
+
+    if (loading) {
+        return <div>Loading events...</div>; // Loading state
+    }
+
+    if (error) {
+        return <div className="error-message">{error}</div>; // Style this in CSS
+    }
+
+    return (
         <div className="event-list">
-      {eventList.map((event) => {
-        return (
-          <EventCard
-            key={event.id}
-            id={event.id}
-            heading={event.heading}
-            date={event.date}
-            location={event.location}
-            img={event.img}
-            description={event.description}
-          />
-        );
-      })}
-      </div>
-    </div>
-    </div>
-  );
-}
+            <h1>All Events</h1>
+            {events.length > 0 ? (
+                <div className="event-cards">
+                    {events.map((event) => (
+                        <EventCard 
+                            key={event.id}
+                            id={event.id}
+                            heading={event.title}
+                            date={event.date}
+                            location={event.location}
+                            img={`http://localhost:8000${event.image}`} 
+                            description={event.description}
+                        />
+                    ))}
+                </div>
+            ) : (
+                <p>No Events Available</p>
+            )}
+        </div>
+    );
+};
 
 export default EventList;
